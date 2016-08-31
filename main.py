@@ -123,12 +123,6 @@ def draw_model(groups, vertices, texture_vertices, textures):
         material_name = group[0]
         texture = textures[material_name][0]
         glBindTexture(GL_TEXTURE_2D, texture)
-        
-        #glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-        ## http://stackoverflow.com/questions/11125827/how-to-use-glbufferdata-in-pyopengl
-        #arr = array("f",vert)
-        #glBufferData(GL_ARRAY_BUFFER, arr.tostring(), GL_STATIC_DRAW)
-        #continue
 
         glBegin(GL_TRIANGLES)
         for face in group[1:]:
@@ -136,6 +130,18 @@ def draw_model(groups, vertices, texture_vertices, textures):
                 glTexCoord2fv(texture_vertices[vt])
                 glVertex3fv(vertices[v])
         glEnd()
+
+def create_model_list(modelname):
+    vertices, texture_vertices, groups = load_model(modelname)
+    textures = load_textures(groups)
+
+    gl_list = glGenLists(1)
+    glNewList(gl_list, GL_COMPILE)
+
+    draw_model(groups, vertices, texture_vertices, textures)
+
+    glEndList()
+    return gl_list
 
 def main():
     isRunning = True
@@ -147,15 +153,15 @@ def main():
 
     glEnable(GL_TEXTURE_2D)
     glFrontFace(GL_CCW)
+    glEnable(GL_DEPTH_TEST)
 
     camera_pos = [0, 0.1, 0]
     camera_rot = [0, 0, 0]
 
     modelname = "model/arwing.obj"
-    modelname = "model/cube.obj"
+    #modelname = "model/cube.obj"
 
-    vertices, texture_vertices, groups = load_model(modelname)
-    textures = load_textures(groups)
+    model = create_model_list(modelname)
 
     while isRunning:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -172,7 +178,7 @@ def main():
         glTranslatef(0, 0, 0.3)
         glScalef(0.25, 0.25, 0.25)
         #draw_point(vertices)
-        draw_model(groups, vertices, texture_vertices, textures)
+        glCallList(model)
         glPopMatrix()
 
         pygame.display.flip()
@@ -199,6 +205,7 @@ def main():
         camera_rot[2] += speed * z
         
         x, y, z = 0, 0, 0
+        speed = 0.0004
         if keys[pygame.K_a]:
             x = -1
         if keys[pygame.K_d]:
@@ -211,9 +218,9 @@ def main():
             z = -1
         if keys[pygame.K_e]:
             z = +1
-        x *= 0.1
-        y *= 0.1
-        z *= 0.1
+        x *= speed
+        y *= speed
+        z *= speed
         camera_pos = [camera_pos[0] + x,
                       camera_pos[1] + y,
                       camera_pos[2] + z,]
