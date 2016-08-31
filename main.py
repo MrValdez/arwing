@@ -1,3 +1,16 @@
+# resources used:
+#  - http://aosabook.org/en/500L/a-3d-modeller.html
+#  - http://pyopengl.sourceforge.net/context/tutorials/index.html
+#  - http://pyopengl.sourceforge.net/documentation/opengl_diffs.html
+#  - https://pythonprogramming.net/opengl-rotating-cube-example-pyopengl-tutorial/
+#  - https://en.wikipedia.org/wiki/Wavefront_.obj_file
+#  - http://stackoverflow.com/questions/22185654/rendering-obj-files-with-opengl
+#  - http://stackoverflow.com/questions/11125827/how-to-use-glbufferdata-in-pyopengl
+#  - http://pygame.org/wiki/SimpleOpenGL2dClasses?parent=
+#  - http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
+#  - http://www.pygame.org/wiki/OBJFileLoader
+
+
 import pygame
 import OpenGL
 
