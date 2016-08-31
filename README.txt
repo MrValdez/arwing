@@ -1,5 +1,7 @@
 
-Model downloaded from: http://www.models-resource.com/gamecube/starfoxassault/model/8646. The readme claim that its a ripped model.
+Arwing model downloaded from: http://www.models-resource.com/gamecube/starfoxassault/model/8646. The readme claim that its a ripped model.
+Cube model downloaded from: http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
+SpongeBob model downloaded from: https://pbs.twimg.com/profile_images/420241225283674113/xoCDeFzV_400x400.jpeg
 
 For tutorial, I used this: https://pythonprogramming.net/opengl-rotating-cube-example-pyopengl-tutorial
 

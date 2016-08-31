@@ -4,7 +4,9 @@ import OpenGL
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-    
+
+from array import array     # http://stackoverflow.com/questions/11125827/how-to-use-glbufferdata-in-pyopengl
+
 def Cube():
     vertices= (
         (1, -1, -1),
@@ -49,13 +51,13 @@ def Cube():
             glVertex3fv(vertices[vertex])
     glEnd()
 
-def load_model():
+def load_model(modelname):
     vertices = []
     texture_vertices = []
     groups = []
     group_buffer = []
 
-    with open("model/arwing.obj") as f:
+    with open(modelname) as f:
         for line in f:
             if line[0] == '#':
                 continue
@@ -80,6 +82,7 @@ def load_model():
 
     groups = groups + [group_buffer]
     groups = [group for group in groups if len(group)]  # remove empty lists
+
     return vertices, texture_vertices, groups
 
 def load_image(image):
@@ -111,9 +114,7 @@ def load_textures(groups):
 
 def draw_point(vertices):
     glBegin(GL_POINTS)
-    glBindTexture(GL_TEXTURE_2D, 1)
     for vertex in vertices:
-        glVertex3fv(vertex)
         glVertex3fv(vertex)
     glEnd()
 
@@ -123,10 +124,15 @@ def draw_model(groups, vertices, texture_vertices, textures):
         texture = textures[material_name][0]
         glBindTexture(GL_TEXTURE_2D, texture)
         
-        #glBegin(GL_LINES)
-        glBegin(GL_TRIANGLE_STRIP)
+        #glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+        ## http://stackoverflow.com/questions/11125827/how-to-use-glbufferdata-in-pyopengl
+        #arr = array("f",vert)
+        #glBufferData(GL_ARRAY_BUFFER, arr.tostring(), GL_STATIC_DRAW)
+        #continue
+
+        glBegin(GL_TRIANGLES)
         for face in group[1:]:
-            for v, vt in face[1:]:
+            for v, vt in face:
                 glTexCoord2fv(texture_vertices[vt])
                 glVertex3fv(vertices[v])
         glEnd()
@@ -140,13 +146,15 @@ def main():
     gluPerspective(120, aspect_ratio, 0.3, 10.0)
 
     glEnable(GL_TEXTURE_2D)
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    glFrontFace(GL_CCW)
 
-    camera_pos = [0, -1, 0]
+    camera_pos = [0, 0.1, 0]
     camera_rot = [0, 0, 0]
 
-    vertices, texture_vertices, groups = load_model()
+    modelname = "model/arwing.obj"
+    modelname = "model/cube.obj"
+
+    vertices, texture_vertices, groups = load_model(modelname)
     textures = load_textures(groups)
 
     while isRunning:
@@ -158,7 +166,7 @@ def main():
         glRotatef(camera_rot[1], 0, 1, 0)
         glRotatef(camera_rot[2], 0, 0, 1)
 
-        Cube()
+#        Cube()
         
         glPushMatrix()
         glTranslatef(0, 0, 0.3)
@@ -171,17 +179,17 @@ def main():
 
         keys = pygame.key.get_pressed()
         x, y, z = 0, 0, 0
-        speed = 10
+        speed = 0.3
         if keys[pygame.K_ESCAPE]:
             isRunning = False
         if keys[pygame.K_LEFT]:
-            x = -1
-        if keys[pygame.K_RIGHT]:
-            x = +1
-        if keys[pygame.K_UP]:
             y = -1
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_RIGHT]:
             y = +1
+        if keys[pygame.K_UP]:
+            x = -1
+        if keys[pygame.K_DOWN]:
+            x = +1
         if keys[pygame.K_PAGEUP]:
             z = -1
         if keys[pygame.K_PAGEDOWN]:
