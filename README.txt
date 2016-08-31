@@ -52,6 +52,8 @@ If you look at the code, the keys for axis mapping is wrong. That's the camera h
 
 Because I neglected the camera code AND I didn't use a proper Perspective matrix, I basically can't put up a skybox. Oh well.
 
+....I had that itch again and I've added simple stars (more like dusts, actually) to the background. Yay.
+
 -----
 
 Arwing model downloaded from: http://www.models-resource.com/gamecube/starfoxassault/model/8646. The readme claim that its a ripped model.

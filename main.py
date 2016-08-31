@@ -138,6 +138,7 @@ def draw_model(groups, vertices, texture_vertices, textures):
         texture = textures[material_name][0]
         glBindTexture(GL_TEXTURE_2D, texture)
 
+        glColor3f(1, 1, 1)
         glBegin(GL_TRIANGLES)
         for face in group[1:]:
             for v, vt in face:
@@ -202,6 +203,28 @@ def move_camera(keys, camera_pos):
                   camera_pos[2] + z]
     return camera_pos
 
+import random
+stars = [[random.uniform(-2, 2),
+          random.uniform(-2, 2),
+          random.uniform(-2, 2)]
+         for i in range(200)]
+
+def draw_stars():
+    glPointSize(3)
+    glBegin(GL_POINTS)
+    for i, star in enumerate(stars):
+        if i % 10:
+            glColor3f(random.uniform(0.8, 1),
+                      random.uniform(0.5, 1),
+                      random.uniform(0.8, 1))
+        glVertex3fv(star)
+    glEnd()
+
+    for i, star in enumerate(stars):
+        stars[i][0] -= 0.0001
+        stars[i][1] -= 0.001
+        stars[i][2] += 0.001
+
 def main():
     isRunning = True
     pygame.init()
@@ -229,6 +252,7 @@ def main():
         glRotatef(camera_rot[2], 0, 0, 1)
 
 #        Cube()
+        draw_stars()
 
         glPushMatrix()
         glTranslatef(0, 0, 0.3)
@@ -236,6 +260,7 @@ def main():
         #draw_point(vertices)
         glCallList(model)
         glPopMatrix()
+        
 
         pygame.display.flip()
 
