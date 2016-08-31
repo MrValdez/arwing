@@ -10,7 +10,6 @@
 #  - http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
 #  - http://www.pygame.org/wiki/OBJFileLoader
 
-
 import pygame
 import OpenGL
 
@@ -18,7 +17,9 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from array import array     # http://stackoverflow.com/questions/11125827/how-to-use-glbufferdata-in-pyopengl
+modelname = "model/arwing.obj"
+#modelname = "model/cube.obj"
+
 
 def Cube():
     vertices= (
@@ -151,10 +152,55 @@ def create_model_list(modelname):
     gl_list = glGenLists(1)
     glNewList(gl_list, GL_COMPILE)
 
+    glFrontFace(GL_CCW)
     draw_model(groups, vertices, texture_vertices, textures)
 
     glEndList()
     return gl_list
+
+def rotate_camera(keys, camera_rot):
+    x, y, z = 0, 0, 0
+    speed = 0.3
+    if keys[pygame.K_LEFT]:
+        y = -1
+    if keys[pygame.K_RIGHT]:
+        y = +1
+    if keys[pygame.K_UP]:
+        x = -1
+    if keys[pygame.K_DOWN]:
+        x = +1
+    if keys[pygame.K_PAGEUP]:
+        z = -1
+    if keys[pygame.K_PAGEDOWN]:
+        z = +1
+    camera_rot[0] += speed * x
+    camera_rot[1] += speed * y
+    camera_rot[2] += speed * z
+
+    return camera_rot
+
+def move_camera(keys, camera_pos):
+    x, y, z = 0, 0, 0
+    speed = 0.0004
+    if keys[pygame.K_a]:
+        x = -1
+    if keys[pygame.K_d]:
+        x = +1
+    if keys[pygame.K_w]:
+        y = -1
+    if keys[pygame.K_s]:
+        y = +1
+    if keys[pygame.K_q]:
+        z = +1
+    if keys[pygame.K_e]:
+        z = -1
+    x *= speed
+    y *= speed
+    z *= speed
+    camera_pos = [camera_pos[0] + x,
+                  camera_pos[1] + y,
+                  camera_pos[2] + z]
+    return camera_pos
 
 def main():
     isRunning = True
@@ -162,7 +208,7 @@ def main():
     display = (800, 600)
     pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
     aspect_ratio = display[0] / display[1]
-    gluPerspective(120, aspect_ratio, 0.3, 10.0)
+    gluPerspective(45, aspect_ratio, 0.3, 5.0)
 
     glEnable(GL_TEXTURE_2D)
     glFrontFace(GL_CCW)
@@ -171,22 +217,19 @@ def main():
     camera_pos = [0, 0.1, 0]
     camera_rot = [0, 0, 0]
 
-    modelname = "model/arwing.obj"
-    #modelname = "model/cube.obj"
-
     model = create_model_list(modelname)
 
     while isRunning:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glLoadIdentity()
 
+        glLoadIdentity()
         glTranslatef(*camera_pos)
         glRotatef(camera_rot[0], 1, 0, 0)
         glRotatef(camera_rot[1], 0, 1, 0)
         glRotatef(camera_rot[2], 0, 0, 1)
 
 #        Cube()
-        
+
         glPushMatrix()
         glTranslatef(0, 0, 0.3)
         glScalef(0.25, 0.25, 0.25)
@@ -197,46 +240,11 @@ def main():
         pygame.display.flip()
 
         keys = pygame.key.get_pressed()
-        x, y, z = 0, 0, 0
-        speed = 0.3
         if keys[pygame.K_ESCAPE]:
             isRunning = False
-        if keys[pygame.K_LEFT]:
-            y = -1
-        if keys[pygame.K_RIGHT]:
-            y = +1
-        if keys[pygame.K_UP]:
-            x = -1
-        if keys[pygame.K_DOWN]:
-            x = +1
-        if keys[pygame.K_PAGEUP]:
-            z = -1
-        if keys[pygame.K_PAGEDOWN]:
-            z = +1
-        camera_rot[0] += speed * x
-        camera_rot[1] += speed * y
-        camera_rot[2] += speed * z
-        
-        x, y, z = 0, 0, 0
-        speed = 0.0004
-        if keys[pygame.K_a]:
-            x = -1
-        if keys[pygame.K_d]:
-            x = +1
-        if keys[pygame.K_w]:
-            y = -1
-        if keys[pygame.K_s]:
-            y = +1
-        if keys[pygame.K_q]:
-            z = -1
-        if keys[pygame.K_e]:
-            z = +1
-        x *= speed
-        y *= speed
-        z *= speed
-        camera_pos = [camera_pos[0] + x,
-                      camera_pos[1] + y,
-                      camera_pos[2] + z,]
+
+        camera_rot = rotate_camera(keys, camera_rot)
+        camera_pos = move_camera(keys, camera_pos)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
